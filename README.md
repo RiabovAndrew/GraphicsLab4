@@ -3,17 +3,27 @@
 # Отчёт по лабораторной работе 3 по Графике GraphicsLab1<br>студента группы ПА-18-2<br>Рябова Андрея Дмитриевича
 
 ## Завдання
-1. Ознайомитись з можливостями графічної бібліотеки GLM. Розібратися з особливостями підключення бібліотеки GLM.
-2. Використовуючи шаблон програми [Task03Src](https://github.com/KnightDanila/GraphicProjects_OpenGL_Shaders_GLSL/tree/master/Lesson3/Task03Src) - запишіть та запустіть код з вашим простором імен.
-3. Використовуйте діаграму UML для довідки: 
-4. Додайте вихід до консолі:
+1. Ознайомитись з можливостями "GLShader.h". Розібратися з особливостями "GLShader.h" класу.
+2. Використовуючи шаблон програми Task04Src [https://github.com/KnightDanila/GraphicProjects_OpenGL_Shaders_GLSL/tree/master/Lesson4/Task04Src] - запишіть та запустить код з вашим простором імен.
+3. Завантажити "BrightAndDim_VertexShader.vs", "BrightAndDim_FragmentShader.fs" до робочої папки;
+4. Додайте вивід до консолі:
 ```
-Task 3 Author: Vasya Pupkin
+Task 4
+Author: Vasya Pupkin
 ```
-1. Створіть камеру за допомогою класу ...::GraphCore::Camera* CamFree = new ...::GraphCore::GLCameraFree();
-2. Встановити перспективу CamFree->setPerspective(...);
-3. Намалюйте об'єкт VBO (з лабораторії 2)
-4. І перемістіть камеру за допомогою {x = r * cos(df); y = r * sin(df);}
+5. Створіть шейдер за допомогою ...::GraphCore::GLShader* shaderBrightDim = new ...::GraphCore::GLShader("BrightAndDim_VertexShader.vs", "BrightAndDim_FragmentShader.fs");
+6. Намалюйте об'єкт VBO (з лабораторної 2) - та додайте шейдер до нього
+7. Додайте дію до клавіатури, щоб змінить колір у шейдері - додайте у main glfwSetKeyCallback(window, keyCallback); та напишіть :
+```
+void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mode) {
+	println((string) "key:" + key + "-scancode:" + scancode + "-action:" + action + "-mode:" + mode);
+
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        println("SPACE");
+        //TO DO
+    }
+}
+```
 ## Выполнение:
 **Main.cpp**
 ```
@@ -39,10 +49,12 @@ Task 3 Author: Vasya Pupkin
 #include "libs\GL_AL\glfw3.h"
 #include "libs\GL_AL\glm\glm.hpp"
 #include "libs\GL_AL\glm\gtc\matrix_transform.hpp"
-#include "libs\GL_AL\shader.h"
+#include "libs\GL_AL\glm\gtc\random.hpp"
+//#include "libs\GL_AL\shader.h"
 
 #include "libs\GL_AL\glut.h"
 #include "libs\GL_AL\glm\gtc\type_ptr.hpp"
+
 
 
 #define GLUT_DISABLE_ATEXIT_HACK
@@ -122,7 +134,7 @@ namespace Cube {
     unsigned int VAO;
     unsigned int texture1;
     unsigned int texture2;
-    Shader ourShader;
+    //Shader ourShader;
 
 
 
@@ -154,12 +166,19 @@ namespace Cube {
 #include "GLRenderSystem.h"
 #include "GLWindow.h";
 #include "GLCamera.h"
+#include "GLShader.h"
+
+glm::vec3 RGB = glm::vec3(0);
 
 using namespace std;
 
-template< typename T >
+string operator+(string s, int i) {
+    return s + to_string(i);
+}
+
+template < typename T>
 void println(T i) {
-	cout << i << endl;
+    cout << i << endl;
 }
 
 void argsEcho(int argc, char** argv) {
@@ -174,6 +193,21 @@ void argsEcho(int argc, char** argv) {
 	}
 	println("____________\n");
 }
+
+
+
+
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+    println((string)"key:" + key + "-scancode:" + scancode + "-action:" + action + "-mode:" + mode);
+
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+        println("SPACE");
+        RGB = glm::vec3(glm::linearRand(0, 1), glm::linearRand(0, 1), glm::linearRand(0, 1));
+    }
+}
+
+
 int main(int argc, char** argv) {
 
 	argsEcho(argc, argv);
@@ -195,11 +229,13 @@ int main(int argc, char** argv) {
 	}
 	renderer->init();
 
-	auto win1 = new rory::GLWindow("Lesson 1", 640, 420);
-	auto win2 = new rory::GLWindow("Lesson 2", 640, 420);
+	//auto win1 = new rory::GLWindow("Lesson 1", 640, 420);
+	//auto win2 = new rory::GLWindow("Lesson 2", 640, 420);
 
 
-	auto window = glfwCreateWindow(640, 480, "Lesson 01 - RAINBOW - Рябов Андрей ПА-18-2", nullptr, nullptr);
+	auto window = glfwCreateWindow(1280, 720, "Lesson 01 - RAINBOW - Рябов Андрей ПА-18-2", nullptr, nullptr);
+
+
 
 	if (!window) {
 		fprintf(
@@ -209,6 +245,8 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
+
+
 	glfwMakeContextCurrent(window);
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK) {
@@ -216,28 +254,32 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetKeyCallback(window, keyCallback);
+
 
     rory::GraphCore::Camera* CamFree = new rory::GraphCore::GLCameraFree();
     CamFree->setPerspective(glm::radians(45.0f), (float) 640 / 420, 0.01f, 1000.0f);
 
+    rory::GraphCore::GLShader* shaderBrightDim = new rory::GraphCore::GLShader("BrightAndDim_VertexShader.vs", "BrightAndDim_FragmentShader.fs");
 
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
 		glfwMakeContextCurrent(window);
         float angle = glfwGetTime() * 50.0f;
         CamFree->setPos(glm::vec3(2 * cos(angle * std::numbers::pi / 180), 2, 2 * sin(angle * std::numbers::pi / 180)));
-        CamFree->start();
-		renderer->render(window);
-        CamFree->end();
+
+        shaderBrightDim->use();
+        shaderBrightDim->setVec3("rgb", RGB);
+        shaderBrightDim->setMat4("modelView", CamFree->getMat4ModelView());
+        shaderBrightDim->setMat4("modelProj", CamFree->getMat4ModelProj());
+        shaderBrightDim->setFloat("time", glfwGetTime());
+
+        renderer->render(window);
+
+        glUseProgram(0);
+
+        glfwPollEvents();
 		glfwSwapBuffers(window);
-		glfwMakeContextCurrent(win1->get_glfw_handle());
-		renderer->render(win1->get_glfw_handle());
-		glfwSwapBuffers(win1->get_glfw_handle());
-		glfwPollEvents();
-		glfwMakeContextCurrent(window);
-		renderer->render(window);
-		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
 
 	glfwTerminate();
@@ -439,6 +481,11 @@ namespace rory {
 
             virtual glm::vec3 getPos() = 0;
 
+            virtual glm::mat4 getMat4ModelView() = 0;
+            virtual glm::mat4 getMat4ModelProj() = 0;
+
+
+
 
         protected:
 
@@ -481,6 +528,14 @@ namespace rory {
             glm::vec3 getPos() {
                 return glm::vec3(0);
             };
+
+            glm::mat4 getMat4ModelView() {
+                return _modelview;
+            };
+
+            glm::mat4 getMat4ModelProj() {
+                return _modelproj;
+            };
         };
 
         class GLCameraTarget : public Camera {
@@ -494,7 +549,201 @@ namespace rory {
 
 #endif /* GLCAMERA_H */
 
+```
+**GLShader.h**
+```
+#ifndef GLSHADER_H
+#define GLSHADER_H
 
+//#include <glad/glad.h>
+//#include <glm/glm.hpp>
+
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+
+namespace rory {
+    namespace GraphCore {
+
+        class GLShader {
+        public:
+            unsigned int ID;
+            // constructor generates the shader on the fly
+            // ------------------------------------------------------------------------
+
+            GLShader() {
+
+
+            }
+
+            GLShader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr) {
+                // 1. retrieve the vertex/fragment source code from filePath
+                std::string vertexCode;
+                std::string fragmentCode;
+                std::string geometryCode;
+                std::ifstream vShaderFile;
+                std::ifstream fShaderFile;
+                std::ifstream gShaderFile;
+                // ensure ifstream objects can throw exceptions:
+                vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+                fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+                gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+                try {
+                    // open files
+                    vShaderFile.open(vertexPath);
+                    fShaderFile.open(fragmentPath);
+                    std::stringstream vShaderStream, fShaderStream;
+                    // read file's buffer contents into streams
+                    vShaderStream << vShaderFile.rdbuf();
+                    fShaderStream << fShaderFile.rdbuf();
+                    // close file handlers
+                    vShaderFile.close();
+                    fShaderFile.close();
+                    // convert stream into string
+                    vertexCode = vShaderStream.str();
+                    fragmentCode = fShaderStream.str();
+                    // if geometry shader path is present, also load a geometry shader
+                    if (geometryPath != nullptr) {
+                        gShaderFile.open(geometryPath);
+                        std::stringstream gShaderStream;
+                        gShaderStream << gShaderFile.rdbuf();
+                        gShaderFile.close();
+                        geometryCode = gShaderStream.str();
+                    }
+                } catch (std::ifstream::failure e) {
+                    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+                }
+                const char* vShaderCode = vertexCode.c_str();
+                const char * fShaderCode = fragmentCode.c_str();
+                // 2. compile shaders
+                unsigned int vertex, fragment;
+                // vertex shader
+                vertex = glCreateShader(GL_VERTEX_SHADER);
+                glShaderSource(vertex, 1, &vShaderCode, NULL);
+                glCompileShader(vertex);
+                checkCompileErrors(vertex, "VERTEX");
+                // fragment Shader
+                fragment = glCreateShader(GL_FRAGMENT_SHADER);
+                glShaderSource(fragment, 1, &fShaderCode, NULL);
+                glCompileShader(fragment);
+                checkCompileErrors(fragment, "FRAGMENT");
+                // if geometry shader is given, compile geometry shader
+                unsigned int geometry;
+                if (geometryPath != nullptr) {
+                    const char * gShaderCode = geometryCode.c_str();
+                    geometry = glCreateShader(GL_GEOMETRY_SHADER);
+                    glShaderSource(geometry, 1, &gShaderCode, NULL);
+                    glCompileShader(geometry);
+                    checkCompileErrors(geometry, "GEOMETRY");
+                }
+                // shader Program
+                ID = glCreateProgram();
+                glAttachShader(ID, vertex);
+                glAttachShader(ID, fragment);
+                if (geometryPath != nullptr)
+                    glAttachShader(ID, geometry);
+                glLinkProgram(ID);
+                checkCompileErrors(ID, "PROGRAM");
+                // delete the shaders as they're linked into our program now and no longer necessery
+                glDeleteShader(vertex);
+                glDeleteShader(fragment);
+                if (geometryPath != nullptr)
+                    glDeleteShader(geometry);
+
+            }
+            // activate the shader
+            // ------------------------------------------------------------------------
+
+            void use() {
+                glUseProgram(ID);
+            }
+            // utility uniform functions
+            // ------------------------------------------------------------------------
+
+            void setBool(const std::string &name, bool value) const {
+                glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
+            }
+            // ------------------------------------------------------------------------
+
+            void setInt(const std::string &name, int value) const {
+                glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+            }
+            // ------------------------------------------------------------------------
+
+            void setFloat(const std::string &name, float value) const {
+                glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+            }
+            // ------------------------------------------------------------------------
+
+            void setVec2(const std::string &name, const glm::vec2 &value) const {
+                glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+            }
+
+            void setVec2(const std::string &name, float x, float y) const {
+                glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
+            }
+            // ------------------------------------------------------------------------
+
+            void setVec3(const std::string &name, const glm::vec3 &value) const {
+                glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+            }
+
+            void setVec3(const std::string &name, float x, float y, float z) const {
+                glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+            }
+            // ------------------------------------------------------------------------
+
+            void setVec4(const std::string &name, const glm::vec4 &value) const {
+                glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+            }
+
+            void setVec4(const std::string &name, float x, float y, float z, float w) {
+                glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w);
+            }
+            // ------------------------------------------------------------------------
+
+            void setMat2(const std::string &name, const glm::mat2 &mat) const {
+                glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+            }
+            // ------------------------------------------------------------------------
+
+            void setMat3(const std::string &name, const glm::mat3 &mat) const {
+                glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+            }
+            // ------------------------------------------------------------------------
+
+            void setMat4(const std::string &name, const glm::mat4 &mat) const {
+                glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+            }
+
+        private:
+            // utility function for checking shader compilation/linking errors.
+            // ------------------------------------------------------------------------
+
+            void checkCompileErrors(GLuint shader, std::string type) {
+                GLint success;
+                GLchar infoLog[1024];
+                if (type != "PROGRAM") {
+                    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+                    if (!success) {
+                        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+                        std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                    }
+                } else {
+                    glGetProgramiv(shader, GL_LINK_STATUS, &success);
+                    if (!success) {
+                        glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+                        std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                    }
+                }
+            }
+        };
+
+    };
+};
+#endif
 ```
 ## Работа программы:
 ![Пример 1](screenshots/screenshot1.jpg)
