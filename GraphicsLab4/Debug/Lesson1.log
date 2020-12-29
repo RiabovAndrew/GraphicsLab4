@@ -1,0 +1,13 @@
+﻿  main.cpp
+E:\Github\GraphicsLab2\GraphicsLab2\GLRenderSystem.h(40,21): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\GLRenderSystem.h(39,61): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\GLRenderSystem.h(39,21): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\GLRenderSystem.h(44,1): warning C4305: +=: усечение из "double" в "float"
+E:\Github\GraphicsLab2\GraphicsLab2\main.cpp(75,19): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\main.cpp(74,55): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\main.cpp(74,19): warning C4244: аргумент: преобразование "double" в "GLclampf", возможна потеря данных
+E:\Github\GraphicsLab2\GraphicsLab2\main.cpp(79,39): warning C4305: +=: усечение из "double" в "float"
+LINK : warning LNK4098: библиотека по умолчанию "MSVCRTD" конфликтует с использованием других библиотек; используйте /NODEFAULTLIB:library
+main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp___invalid_parameter в функции "void * __cdecl std::_Allocate_manually_vector_aligned<struct std::_Default_allocate_traits>(unsigned int)" (??$_Allocate_manually_vector_aligned@U_Default_allocate_traits@std@@@std@@YAPAXI@Z)
+main.obj : error LNK2019: ссылка на неразрешенный внешний символ __imp___CrtDbgReport в функции "void * __cdecl std::_Allocate_manually_vector_aligned<struct std::_Default_allocate_traits>(unsigned int)" (??$_Allocate_manually_vector_aligned@U_Default_allocate_traits@std@@@std@@YAPAXI@Z)
+E:\Github\GraphicsLab2\GraphicsLab2\Debug\Lesson1.exe : fatal error LNK1120: неразрешенных внешних элементов: 2
